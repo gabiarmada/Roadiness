@@ -23,7 +23,7 @@ gridPoints <- data.frame(unique_commutes_df)
 ```
 
 <br />
-Next, create a SpatialPoints object from our commute data. The following lines of code extract the Longitude and Latitude columns from the `gridPoints` dataframe we just created, and assign the result to `xy`. We use the function `SpatialPoints()`, with `xy` as the input for the coords parameter and `p4s` as the input for the proj4string parameter. Once the SpatialPoionts object has been created, we use `project()` from the `proj4` package in order to project our GPS coordinates onto the same coordinate reference system used by the Roadiness data. In doing so, our GPS coordinates data are now compatible with the Roadiness data: 
+Next, create a SpatialPoints object from our commute data. The following lines of code extract the Longitude and Latitude columns from the `gridPoints` dataframe we initialized, and assign the output to `xy`. We use the function `SpatialPoints()`, with `xy` as the input for the coords parameter and `p4s` as the input for the proj4string parameter. Once the SpatialPoionts object has been created, we use `project()` from the `proj4` package in order to project our GPS coordinates onto the same coordinate reference system used by the Roadiness data. In doing so, our GPS coordinates data are now compatible with the Roadiness data: 
 
 ```
 # extract longitude and latitude (in that order)
@@ -46,7 +46,9 @@ gridPolygon@data$grid_cell <- 1:nrow(gridPolygon)
 ```
 
 <br /> 
-Finally, we assign our GPS commute locations to Roadiness grid cells. The function `point.in.poly()` intersects point and polygon feature classes and adds polygon attributes to points. We assign the output to the variable `pointinPolygon` of class SpatialPointsDataFrame. Next, we use the function `project()` to transform our coordinates back to their original projection. We convert `pointinPolygon` to a readable dataframe using the function `as.data.frame()`, and assign the output to the variable `points_gridcell`. We remove the first column of `points_gridcell`  which contains row ID numbers; this information is unneeded. Next, we rename the Longitude & Latitude columns and relocate them to their respective columns. Lastly, save the `points_gridcell` dataframe as .Rdata: 
+Finally, we assign our GPS commute locations to Roadiness grid cells. The function `point.in.poly()` intersects point and polygon feature classes and adds polygon attributes to points. We assign the output to the variable `pointinPolygon`, which is of class SpatialPointsDataFrame. Next, we use the function `project()` to transform our coordinates back to their original projection. <br /> 
+
+We convert `pointinPolygon` to a readable dataframe using the function `as.data.frame()`, and assign the output to the variable `points_gridcell`. We remove the first column of `points_gridcell`  which contains row ID numbers; this information is unneeded. Next, we rename the Longitude & Latitude columns and relocate them to their respective order. Lastly, save the `points_gridcell` dataframe as .Rdata: 
 
 ```
 # find which polygons our lat/lon points intersect:  
@@ -71,12 +73,15 @@ The final result is a 729689 x 4 dataframe,`points_gridcell`, with column variab
 
 ## Roadiness dataset 
 Let's create a roadiness dataset containing the following columns: 
->  ID, date/time, commute PM, latitude of commute, longitude of commute, roadiness.  
+> ID, date/time, commute PM, latitude of commute, longitude of commute, roadiness.  
 
 Refer to [roadiness_dataset.R](https://github.com/gabiarmada/Roadiness/blob/main/roadiness_dataset.R). Let's step through this R code. <br /> 
 
 <br />
-After loading the required packages and `GMU_commute()` function, we must first create a commutes dataframe. Similar to the Summary Commutes Procedure, we create a list of GPS data file paths using the function `fs::dir_ls()`, and assign the output to the variable `file_paths`. Next, we initialize the commutes dataframe and set the respective column names. Then, we loop our GPS data files into the `GMU_commute()` file parameter, with the output parameter set to "df". Within the loop, we mutate a column `participant` using the function `substr()` to extract participant IDs. We use `rbind()` to create a commutes dataframe of all participant GPS data: 
+After loading the required packages and `GMU_commute()` function, we must first create a commutes dataframe. Similar to the Summary Commutes Procedure, we create a list of GPS data file paths using the function `fs::dir_ls()`, and assign the output to the variable `file_paths`. We initialize the commutes dataframe and set the respective column names. <br /> 
+
+Then, we loop our GPS data files into the `GMU_commute()` file parameter, with the output parameter set to "df". Within the loop, we mutate a column `participant` using the function `substr()` to extract participant IDs. The function `rbind()` is used to create a commutes dataframe containing all participant GPS data: 
+
 > Note: change the start and stop parameters of `substr()` in order to reproduce this R code. 
 
 
@@ -98,17 +103,18 @@ for (i in seq_along(file_paths)){
 ```
 
 <br /> 
-Next, we load the roadiness grid cell data created in the previous section into our enviornment: 
+Next, load the roadiness grid cell dataset created in the previous section: 
 
 ```
 load(here("points_gricell.Rdata"))
 ```
 
 <br /> 
-The following lines of code are used to create a roadiness dataset. First, we transform our commutes dataframe `Date & Time` column to a POSIXct varaible type using the lubridate package. Then, we select our columns of interest: `Date & Time`, `Longtiude`, `Latitude`, and `participant`. 
+The following lines of code are used to create a roadiness dataset. First, we transform our commutes dataframe `Date & Time` column to a POSIXct variable type using the lubridate package. Then, we select our columns of interest: `Date & Time`, `Longtiude`, `Latitude`, and `participant`. 
 
 <br /> 
-In order to perform a seamless left join with our commutes and roadiness grid cell data, we must convert our Longitude and Latitude columns to character variable types. Then, we can perform a left join with `commutes_df` and `points_gridcell` by columns `Longitude` & `Latitude`, and assign the output to the variable `roadiness_commutes`. We use `na.omit()` to remove NA values from our `roadiness_commutes` dataframe. 
+In order to perform a seamless left join with our commutes and roadiness grid cell data, we must first convert our Longitude and Latitude columns to character variable types. Then, we can perform a left join with `commutes_df` and `points_gridcell` by columns `Longitude` & `Latitude`, and assign the output to the variable `roadiness_commutes`. We use `na.omit()` to remove NA values from our `roadiness_commutes` dataframe. 
+
 > Some participants yield NA values for roadiness. This is due to the fact that the roadiness grid only accounts for the region of Northern Virginia, and some participants may have driven outside of this area (i.e., to other states/ counties). Let’s remove the NA values so that only Northern Virginia commutes are included.
 
 <br /> 
