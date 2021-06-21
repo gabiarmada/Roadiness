@@ -72,14 +72,11 @@ After loading the required packages and `GMU_commute()` function, we must first 
 > Note: change the start and stop parameters of `substr()` in order to reproduce this R code. 
 
 ```
-# create a list of GPS data file paths 
 file_paths <- fs::dir_ls(here("GPS data"))
 
-# initialize GPS commutes data frame 
 commutes_df <- data.frame(matrix(ncol = 8, nrow = 0))
 colnames(commutes_df) <- c("Date & Time", "Latitude", "Longitude", "Trip", "Trip duration", "Trip distance", "trip_total_time", "missing")
 
-# loop GPS data files into GMU_commute() file parameter 
 for (i in seq_along(file_paths)){
   df <- GMU_commute(file = file_paths[i], output = "df") %>%
         mutate(participant = substr(file_paths[i], start = 48, stop = 51))
