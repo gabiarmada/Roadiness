@@ -1,5 +1,6 @@
 # Roadiness
-Roadiness, developed by Dr. Lucas Henneman, is a measure of how "roady" a particular area is based on its proximity to major highways & roadways. Roadiness measurements were assigned to 1 kilometer grids in the Northern Virginia / DC area. <br /><br />
+Roadiness, developed by Dr. Lucas Henneman, is a measure of how "roady" a particular area is based on its proximity to major highways & roadways. Roadiness measurements were assigned to 1 kilometer grids in the Northern Virginia / DC area. 
+<br /><br />
 
 The goal of the Roadiness project is to assign latitude & longitude GPS points collected by participants in Northern Virginia/ DC to roadiness grid cells. In doing so, we are able to observe the variability of roadiness within participant commutes and test for an association between roadiness and exposed PM 2.5 levels. <br /> 
 
@@ -46,7 +47,7 @@ gridPolygon@data$grid_cell <- 1:nrow(gridPolygon)
 ```
 
 <br /> 
-Finally, we assign our GPS commute locations to Roadiness grid cells. The function `point.in.poly()` intersects point and polygon feature classes and adds polygon attributes to points. We assign the output to the variable `pointinPolygon`, which is of class SpatialPointsDataFrame. Next, we use the function `project()` to transform our coordinates back to their original projection. <br /> 
+Finally, we assign our GPS commute locations to Roadiness grid cells. The function `point.in.poly()` intersects point and polygon feature classes and adds polygon attributes to points. We assign the output to the variable `pointinPolygon`, which is of class SpatialPointsDataFrame. Next, we use the function `project()` to transform our coordinates back to their original projection. <br /> <br />
 
 We convert `pointinPolygon` to a readable dataframe using the function `as.data.frame()`, and assign the output to the variable `points_gridcell`. We remove the first column of `points_gridcell`  which contains row ID numbers; this information is unneeded. Next, we rename the Longitude & Latitude columns and relocate them to their respective order. Lastly, save the `points_gridcell` dataframe as .Rdata: 
 
@@ -78,8 +79,9 @@ Let's create a roadiness dataset containing the following columns:
 Refer to [roadiness_dataset.R](https://github.com/gabiarmada/Roadiness/blob/main/roadiness_dataset.R). Let's step through this R code. <br /> 
 
 <br />
-After loading the required packages and `GMU_commute()` function, we must first create a commutes dataframe. Similar to the Summary Commutes Procedure, we create a list of GPS data file paths using the function `fs::dir_ls()`, and assign the output to the variable `file_paths`. We initialize the commutes dataframe and set the respective column names. <br /> 
+After loading the required packages and `GMU_commute()` function, we must first create a commutes dataframe. Similar to the Summary Commutes Procedure, we create a list of GPS data file paths using the function `fs::dir_ls()`, and assign the output to the variable `file_paths`. We initialize the commutes dataframe and set the respective column names. 
 
+<br /> <br />
 Then, we loop our GPS data files into the `GMU_commute()` file parameter, with the output parameter set to "df". Within the loop, we mutate a column `participant` using the function `substr()` to extract participant IDs. The function `rbind()` is used to create a commutes dataframe containing all participant GPS data: 
 
 > Note: change the start and stop parameters of `substr()` in order to reproduce this R code. 
@@ -112,7 +114,7 @@ load(here("points_gricell.Rdata"))
 <br /> 
 The following lines of code are used to create a roadiness dataset. First, we transform our commutes dataframe `Date & Time` column to a POSIXct variable type using the lubridate package. Then, we select our columns of interest: `Date & Time`, `Longtiude`, `Latitude`, and `participant`. 
 
-<br /> 
+<br /> <br />
 In order to perform a seamless left join with our commutes and roadiness grid cell data, we must first convert our Longitude and Latitude columns to character variable types. Then, we can perform a left join with `commutes_df` and `points_gridcell` by columns `Longitude` & `Latitude`, and assign the output to the variable `roadiness_commutes`. We use `na.omit()` to remove NA values from our `roadiness_commutes` dataframe. 
 
 > Some participants yield NA values for roadiness. This is due to the fact that the roadiness grid only accounts for the region of Northern Virginia, and some participants may have driven outside of this area (i.e., to other states/ counties). Let’s remove the NA values so that only Northern Virginia commutes are included.
