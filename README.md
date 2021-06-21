@@ -9,17 +9,22 @@ The goal of the Roadiness project is to assign latitude & longitude GPS points c
 This section focuses on assigning unique lat/long participant GPS coordinates to roadiness levels and their corresponding grid cells. Refer to [commutes_to_gricell.R](https://github.com/gabiarmada/Roadiness/blob/main/commutes_to_gridcell.R). Let's step through this R code. <br /> 
 
 After loading the required packages, we must first define a coordinate system. I am using the same coordinate system defined in Dr. Henneman's Roadiness plot: 
+
 ```
 p4s <- "+proj=lcc +lat_1=33 +lat_2=45 +lat_0=40 +lon_0=-97 +a=6370000 +b=6370000"
 ```
+
 <br />
 Next, load in the unique commutes data and assign it to a data frame `gridPoints`. This data frame contains only unique latitude & longitude GPS locations collected by participants: 
+
 ```
 load("/Users/gabiarmada/Downloads/GMU URA /GPS/unique_commutes_df.Rdata")
 gridPoints <- data.frame(unique_commutes_df)
 ```
+
 <br />
 Next, create a SpatialPoints object from our commute data. The following lines of code extract the Longitude and Latitude columns from the `gridPoints` dataframe we just created, and assign the result to `xy`. We use the function `SpatialPoints()`, with `xy` as the input for the coords parameter and `p4s` as the input for the proj4string parameter. Once the SpatialPoionts object has been created, we use `project()` from the `proj4` package in order to project our GPS coordinates onto the same coordinate reference system used by the Roadiness data. In doing so, our GPS coordinates data are now compatible with the Roadiness data: 
+
 ```
 # extract longitude and latitude (in that order)
 xy <- gridPoints[,2:1]
@@ -34,12 +39,15 @@ The following lines of code create a SpatialPolygons object from the Roadiness d
 
 > Note: `roadiness.r` is a RasterLayer object that contains the variable `leng.distm2_scale` for each Northern Virginia & DC area grid cell. `leng.distm2_scale` is measurement for roadiness. There are 35,100 total grid cells with each one associated with a level of roadiness. Roadiness levels range from (-1.807038, 4.390482).
 
+
 ```
 gridPolygon <- rasterToPolygons( roadiness.r)
 gridPolygon@data$grid_cell <- 1:nrow(gridPolygon)
 ```
+
 <br /> 
 Finally, we assign our GPS commute locations to Roadiness grid cells. The function `point.in.poly()` intersects point and polygon feature classes and adds polygon attributes to points. We assign the output to the variable `pointinPolygon` of class SpatialPointsDataFrame. Next, we use the function `project()` to transform our coordinates back to their original projection. We convert `pointinPolygon` to a readable dataframe using the function `as.data.frame()`, and assign the output to the variable `points_gridcell`. We remove the first column of `points_gridcell`  which contains row ID numbers; this information is unneeded. Next, we rename the Longitude & Latitude columns and relocate them to their respective columns. Lastly, save the `points_gridcell` dataframe as .Rdata: 
+
 ```
 # find which polygons our lat/lon points intersect:  
 pointinPolygon <- point.in.poly(gridPoints, gridPolygon, sp = TRUE)
@@ -71,12 +79,16 @@ Refer to [roadiness_dataset.R](https://github.com/gabiarmada/Roadiness/blob/main
 After loading the required packages and `GMU_commute()` function, we must first create a commutes dataframe. Similar to the Summary Commutes Procedure, we create a list of GPS data file paths using the function `fs::dir_ls()`, and assign the output to the variable `file_paths`. Next, we initialize the commutes dataframe and set the respective column names. Then, we loop our GPS data files into the `GMU_commute()` file parameter, with the output parameter set to "df". Within the loop, we mutate a column `participant` using the function `substr()` to extract participant IDs. We use `rbind()` to create a commutes dataframe of all participant GPS data: 
 > Note: change the start and stop parameters of `substr()` in order to reproduce this R code. 
 
+
 ```
+# create a list of GPS data file paths 
 file_paths <- fs::dir_ls(here("GPS data"))
 
+# initialize GPS commutes data frame 
 commutes_df <- data.frame(matrix(ncol = 8, nrow = 0))
 colnames(commutes_df) <- c("Date & Time", "Latitude", "Longitude", "Trip", "Trip duration", "Trip distance", "trip_total_time", "missing")
 
+# loop GPS data files into GMU_commute() file parameter 
 for (i in seq_along(file_paths)){
   df <- GMU_commute(file = file_paths[i], output = "df") %>%
         mutate(participant = substr(file_paths[i], start = 48, stop = 51))
@@ -87,6 +99,7 @@ for (i in seq_along(file_paths)){
 
 <br /> 
 Next, we load the roadiness grid cell data created in the previous section into our enviornment: 
+
 ```
 load(here("points_gricell.Rdata"))
 ```
@@ -100,6 +113,7 @@ In order to perform a seamless left join with our commutes and roadiness grid ce
 
 <br /> 
 Finally, we reorder the columns of `roadiness_commutes` and save the resulting dataframe:
+
 ```
 # transform commutes_df Date & Time column using lubridate package 
 commutes_df$`Date & Time`<-  commutes_df$`Date & Time`%>% 
