@@ -29,7 +29,9 @@ gridPoints <- data.frame(unique_commutes_df)
 ```
 
 <br />
-Next, create a SpatialPoints object from our commute data. The following lines of code extract the Longitude and Latitude columns from the `gridPoints` dataframe we initialized, and assign the output to `xy`. We use the function `SpatialPoints()`, with `xy` as the input for the coords parameter and `p4s` as the input for the proj4string parameter. Once the SpatialPoionts object has been created, we use `project()` from the `proj4` package in order to project our GPS coordinates onto the same coordinate reference system used by the Roadiness data. In doing so, our GPS coordinates data are now compatible with the Roadiness data: 
+Next, create a SpatialPoints object from our commute data. The following lines of code extract the Longitude and Latitude columns from the `gridPoints` dataframe we initialized, and assign the output to `xy`.<br /><br />
+
+We use the function `SpatialPoints()`, with `xy` as the input for the coords parameter and `p4s` as the input for the proj4string parameter. Once the SpatialPoionts object has been created, we use `project()` from the `proj4` package in order to project our GPS coordinates onto the same coordinate reference system used by the Roadiness data. In doing so, our GPS coordinates data are now compatible with the Roadiness data: 
 
 ```
 # extract longitude and latitude (in that order)
@@ -116,6 +118,7 @@ load(here("points_gricell.Rdata"))
 
 <br /> 
 The following lines of code are used to create a roadiness dataset. First, we transform our commutes dataframe `Date & Time` column to a POSIXct variable type using the lubridate package. Then, we select our columns of interest: `Date & Time`, `Longtiude`, `Latitude`, and `participant`: 
+
 ```
 # transform commutes_df Date & Time column using lubridate package 
 commutes_df$`Date & Time`<-  commutes_df$`Date & Time`%>% 
@@ -127,6 +130,7 @@ commutes_df <- commutes_df[, -(4:8)]
 
 <br /> <br />
 In order to perform a seamless left join with our commutes and roadiness grid cell data, we must first convert our Longitude and Latitude columns to character variable types. Then, we can perform a left join with `commutes_df` and `points_gridcell` by columns `Longitude` & `Latitude`, and assign the output to the variable `roadiness_commutes`. We use `na.omit()` to remove NA values from our `roadiness_commutes` dataframe:
+
 ```
 # convert Longitude and Latitude columns to character type: 
 # doing this allows for left_join to match up columns seamlessly 
@@ -145,6 +149,7 @@ roadiness_commutes <- na.omit(roadiness_commutes)
 
 <br /> 
 Finally, we reorder the columns of `roadiness_commutes` and save the resulting dataframe:
+
 ```
 # reorder columns 
 roadiness_commutes <- roadiness_commutes[, c("Date & Time", "participant", "Longitude", "Latitude", "leng.distm2_scale", "grid_cell")]
