@@ -46,13 +46,12 @@ gridPoints@coords <- project(coordinates(gridPoints), p4s)
 <br />
 The following lines of code create a SpatialPolygons object from the Roadiness data. The function `rasterToPolygons()` converts the roadiness raster object to a SpatialPolygonsDataFrame, and assigns the output to the variable `gridPolygon`. Then, we number the roadiness grid cells by `1:nrow(gridPolygon)`:
 
-> Note: `roadiness.r` is a RasterLayer object that contains the variable `leng.distm2_scale` for each Northern Virginia & DC area grid cell. `leng.distm2_scale` is measurement for roadiness. There are 35,100 total grid cells with each one associated with a level of roadiness. Roadiness levels range from (-1.807038, 4.390482).
-
-
 ```
 gridPolygon <- rasterToPolygons( roadiness.r)
 gridPolygon@data$grid_cell <- 1:nrow(gridPolygon)
 ```
+
+> Note: `roadiness.r` is a RasterLayer object that contains the variable `leng.distm2_scale` for each Northern Virginia & DC area grid cell. `leng.distm2_scale` is measurement for roadiness. There are 35,100 total grid cells with each one associated with a level of roadiness. Roadiness levels range from (-1.807038, 4.390482).
 
 <br /> 
 
