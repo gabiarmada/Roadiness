@@ -21,7 +21,7 @@ p4s <- "+proj=lcc +lat_1=33 +lat_2=45 +lat_0=40 +lon_0=-97 +a=6370000 +b=6370000
 ```
 
 <br />
-Next, load in the unique commutes data and assign it to a data frame `gridPoints`. This data frame contains only unique latitude & longitude GPS locations collected by participants: <br /> 
+Next, load in the unique commutes data and assign it to a data frame **gridPoints**. This data frame contains only unique latitude & longitude GPS locations collected by participants: <br /> 
 
 ```
 load(here("unique_commutes_df.Rdata"))
@@ -44,7 +44,7 @@ gridPoints@coords <- project(coordinates(gridPoints), p4s)
 ```
 
 <br />
-The following lines of code create a SpatialPolygons object from the Roadiness data. The function `rasterToPolygons()` converts the roadiness raster object to a SpatialPolygonsDataFrame, and assigns the output to the variable `gridPolygon`. Then, we number the roadiness grid cells by `1:nrow(gridPolygon)`:
+The following lines of code create a SpatialPolygons object from the Roadiness data. The function **rasterToPolygons()** converts the roadiness raster object to a SpatialPolygonsDataFrame, and assigns the output to the variable **gridPolygon**. Then, we number the roadiness grid cells by **1:nrow(gridPolygon)**:
 
 ```
 gridPolygon <- rasterToPolygons( roadiness.r)
@@ -118,7 +118,7 @@ load(here("points_gricell.Rdata"))
 ```
 
 <br /> 
-The following lines of code are used to create a roadiness dataset. First, we transform the `Date & Time` column of our commutes data frame to a POSIXct variable type using the lubridate package. Then, we select our columns of interest: `Date & Time`, `Longtiude`, `Latitude`, and `participant`:
+The following lines of code are used to create a roadiness dataset. First, we transform the **Date & Time** column of our commutes data frame to a POSIXct variable type using the lubridate package. Then, we select our columns of interest: **Date & Time**, **Longtiude**, **Latitude**, and **participant**:
 
 ```
 # transform commutes_df Date & Time column using lubridate package 
@@ -149,7 +149,7 @@ roadiness_commutes <- na.omit(roadiness_commutes)
 > Some participants yield NA values for roadiness. This is due to the fact that the roadiness grid only accounts for the region of Northern Virginia, and some participants may have driven outside of this area (i.e., to other states/ counties). Let’s remove the NA values so that only Northern Virginia commutes are included.
 
 <br /> 
-Finally, we reorder the columns of `roadiness_commutes` and save the resulting dataframe:
+Finally, we reorder the columns of **roadiness_commutes** and save the resulting dataframe:
 
 ```
 # reorder columns 
