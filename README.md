@@ -15,14 +15,12 @@ The goal of the Roadiness project is to assign latitude & longitude GPS points c
 This section focuses on assigning unique lat/long participant GPS coordinates to roadiness levels and their corresponding grid cells. Refer to [commutes_to_gricell.R](https://github.com/gabiarmada/Roadiness/blob/main/commutes_to_gridcell.R). Let's step through this R code. <br /> 
 
 After loading the required packages, we must first define a coordinate system. I am using the same coordinate system defined in Dr. Henneman's Roadiness plot: 
-
 ```
 p4s <- "+proj=lcc +lat_1=33 +lat_2=45 +lat_0=40 +lon_0=-97 +a=6370000 +b=6370000"
 ```
 
 <br />
-Next, load in the unique commutes data and assign it to a data frame ```gridPoints```. This data frame contains only unique latitude & longitude GPS locations collected by participants: <br /> 
-
+Next, load in the unique commutes data and assign it to a data frame `gridPoints`. This data frame contains only unique latitude & longitude GPS locations collected by participants: 
 ```
 load(here("unique_commutes_df.Rdata"))
 gridPoints <- data.frame(unique_commutes_df)
@@ -33,7 +31,6 @@ gridPoints <- data.frame(unique_commutes_df)
 Next, create a SpatialPoints object from our commute data. The following lines of code extract the Longitude and Latitude columns from the `gridPoints` dataframe we initialized, and assign the output to `xy`.<br /><br />
 
 We use the function `SpatialPoints()`, with `xy` as the input for the coords parameter and `p4s` as the input for the proj4string parameter. Once the SpatialPoionts object has been created, we use `project()` from the `proj4` package in order to project our GPS coordinates onto the same coordinate reference system used by the Roadiness data. In doing so, our GPS coordinates data are now compatible with the Roadiness data: 
-
 ```
 # extract longitude and latitude (in that order)
 xy <- gridPoints[,2:1]
@@ -44,8 +41,7 @@ gridPoints@coords <- project(coordinates(gridPoints), p4s)
 ```
 
 <br />
-The following lines of code create a SpatialPolygons object from the Roadiness data. The function **rasterToPolygons()** converts the roadiness raster object to a SpatialPolygonsDataFrame, and assigns the output to the variable **gridPolygon**. Then, we number the roadiness grid cells by **1:nrow(gridPolygon)**:
-
+The following lines of code create a SpatialPolygons object from the Roadiness data. The function `rasterToPolygons()` converts the roadiness raster object to a SpatialPolygonsDataFrame, and assigns the output to the variable `gridPolygon`. Then, we number the roadiness grid cells by `1:nrow(gridPolygon)`:
 ```
 gridPolygon <- rasterToPolygons( roadiness.r)
 gridPolygon@data$grid_cell <- 1:nrow(gridPolygon)
@@ -58,7 +54,6 @@ gridPolygon@data$grid_cell <- 1:nrow(gridPolygon)
 Finally, we assign our GPS commute locations to Roadiness grid cells. The function `point.in.poly()` intersects point and polygon feature classes and adds polygon attributes to points. We assign the output to the variable `pointinPolygon`, which is of class SpatialPointsDataFrame. Next, we use the function `project()` to transform our coordinates back to their original projection. <br /> <br />
 
 We convert `pointinPolygon` to a readable dataframe using the function `as.data.frame()`, and assign the output to the variable `points_gridcell`. We remove the first column of `points_gridcell`  which contains row ID numbers; this information is unneeded. Next, we rename the Longitude & Latitude columns and relocate them to their respective order. Lastly, save the `points_gridcell` dataframe as .Rdata: 
-
 ```
 # find which polygons our lat/lon points intersect:  
 pointinPolygon <- point.in.poly(gridPoints, gridPolygon, sp = TRUE)
@@ -118,7 +113,7 @@ load(here("points_gricell.Rdata"))
 ```
 
 <br /> 
-The following lines of code are used to create a roadiness dataset. First, we transform the **Date & Time** column of our commutes data frame to a POSIXct variable type using the lubridate package. Then, we select our columns of interest: **Date & Time**, **Longtiude**, **Latitude**, and **participant**:
+The following lines of code are used to create a roadiness dataset. First, we transform the `Date & Time` column of our commutes data frame to a POSIXct variable type using the lubridate package. Then, we select our columns of interest: `Date & Time`, `Longtiude`, `Latitude`, and `participant`:
 
 ```
 # transform commutes_df Date & Time column using lubridate package 
